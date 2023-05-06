@@ -39,7 +39,7 @@ public class UserController {
         log.info("authentication.isAuthenticated()  {} ", authentication);
 
         if (authentication.isAuthenticated()) {
-        log.info("jwtService.generateToken(authRequest.getName())  {} ", jwtService.generateToken(userDto.getName()).toString());
+        log.info("jwtService.generateToken(authRequest.getName())  {} ", jwtService.generateToken(userDto.getName()));
             return jwtService.generateToken(userDto.getName());
         } else {
             throw new UsernameNotFoundException("The user cannot be authenticated");
@@ -49,8 +49,9 @@ public class UserController {
 
     // an end point for signing up new users
     @PostMapping("/signup")
-    public User signupUser(@RequestBody User user){
-        return userService.addUser(user);
+    public String signupUser(@RequestBody User user){
+        User newUser = userService.addUser(user);
+        return jwtService.generateToken(newUser.getName());
     }
 
 
