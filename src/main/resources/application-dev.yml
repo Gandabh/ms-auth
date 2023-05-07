@@ -17,3 +17,8 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: update
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8088/eureka/
