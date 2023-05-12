@@ -60,13 +60,13 @@ public class UserController {
         return "This is an unprotected endpoint";
     }
 
-    @GetMapping("/admin")
+    @GetMapping("/customer")
     public String adminAPI() {
-        return "Protected endpoint - only admins are allowed";
+        return "Protected endpoint - only customers are allowed";
     }
 
-    @GetMapping("/user")
+    @GetMapping("/employee")
     public String userAPI() {
-        return "Protected endpoint - only users are allowed";
+        return "Protected endpoint - only employees are allowed";
     }
 }
