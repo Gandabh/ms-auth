@@ -62,7 +62,7 @@ public class UserController {
 
     @GetMapping("/customer")
     public String adminAPI() {
-        return "Protected endpoint - only customers are allowed";
+        return "Protected endpoint - only customers  are allowed";
     }
 
     @GetMapping("/employee")
