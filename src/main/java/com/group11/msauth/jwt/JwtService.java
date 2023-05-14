@@ -122,4 +122,9 @@ public class JwtService {
         log.info("extractRoles  {} ", extractRoles(token));
         return (username.equals(userDetails.getUsername())  && !isTokenExpired(token));
     }
+
+    public Boolean validateToken(String token){
+        token = token.split(" ")[1];
+        return !isTokenExpired(token);
+    }
 }

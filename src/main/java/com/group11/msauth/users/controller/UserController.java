@@ -46,6 +46,10 @@ public class UserController {
         }
     }
 
+    @GetMapping("/authenticate")
+    public Boolean validateToken(@RequestHeader("Authorization") String token){
+        return jwtService.validateToken(token);
+    }
 
     // an end point for signing up new users
     @PostMapping("/signup")
