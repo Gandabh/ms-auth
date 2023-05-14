@@ -1,5 +1,7 @@
 package com.group11.msauth.jwt;
 
+import com.group11.msauth.users.model.User;
+import com.group11.msauth.users.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -16,10 +18,7 @@ import com.group11.msauth.config.MyUserDetailsService;
 
 
 import java.security.Key;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @Slf4j
@@ -29,6 +28,9 @@ public class JwtService {
     @Autowired
     private MyUserDetailsService userDetailsService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     // A funtion to generate the token
     // jwt has three componenets, all of them are called claims
     // We need to store these three compoenents in a format that allows us to deal with them properly, and that is why we are using HashMap()
@@ -36,8 +38,16 @@ public class JwtService {
     // After that, we are passing the claims (HashMap()) and the username to another function to create the jwt token.
     public String generateToken(String userName){
         Map<String,Object> claims = new HashMap<>();
-        return createToken(claims, userName);
-        }
+        User user = getUserByName(userName);
+        claims.put("roles", user.getRoles());
+        claims.put("userId", user.getId());
+        claims.put("userName", user.getName());
+        return Jwts.builder() //Adds all given name/value pairs to the JSON Claims in the payload.
+                .setClaims(claims) // setting our claims
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis()+1000*60*60)) // when setting an expiration "Date", we use milliseconds, the easiet way to set it is using the following format 1000(1000 milliseconds  = second)*60 (1 second * 60 =  a minutes) *60 (1 minute * 60 =  1 hour) -> 1000*60*60 = 1 hour
+                .signWith(signingKey(), SignatureAlgorithm.HS256).compact();
+    }
     
     
     private String createToken(Map<String, Object> claims, String userName) {
@@ -55,13 +65,13 @@ public class JwtService {
         
         // After, extracting the authorities/roles and removing the "[" "]", e are adding the authorities/roles to the claim 
             claims.put("roles", rolesClaim); 
-            
+
             return Jwts.builder() //Adds all given name/value pairs to the JSON Claims in the payload.
                     .setClaims(claims) // setting our claims
                     // JWTs claims are pieces of information asserted about a subject,
                     // The subject identifies the principal that is the subject of the JWT.
                     // The subject of our JWT is the user in our case, and here we are using her/his name
-                    .setSubject(userName) 
+                    .setSubject(userName)
                     //.addClaims(roles)
                     .setIssuedAt(new Date(System.currentTimeMillis())) 
                     .setExpiration(new Date(System.currentTimeMillis()+1000*60*60)) // when setting an expiration "Date", we use milliseconds, the easiet way to set it is using the following format 1000(1000 milliseconds  = second)*60 (1 second * 60 =  a minutes) *60 (1 minute * 60 =  1 hour) -> 1000*60*60 = 1 hour
@@ -70,6 +80,11 @@ public class JwtService {
                     // .compact() is the final step, and it builds the JWT and serializes it to a compact, URL-safe string according to the JWT Compact Serialization rules.
                     .signWith(signingKey(), SignatureAlgorithm.HS256).compact();
         }
+
+    public User getUserByName(String userName){
+        Optional<User> user = userRepository.findByName(userName);
+        return user.orElse(null);
+    }
     
         // For generating a secret key, You can use https://www.allkeysgenerator.com/Random/Security-Encryption-Key-Generator.aspx
         // Check the HEX and it is better to use a 256-bit to generate your secret key
