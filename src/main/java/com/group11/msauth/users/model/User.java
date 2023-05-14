@@ -21,12 +21,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
+
+    @Column(nullable = false,name="full_name")
+    @JsonProperty("full_name")
+    private String fullName;
 
     @Column(nullable = false, unique = true)
     private String email;
-
 
 //    @Size(min = 6, max = 20)
     @Column(nullable = false, unique = true)
